@@ -12,7 +12,6 @@ aunque cada harness use un transporte distinto.
 | [`docs/agent-routing.md`](docs/agent-routing.md) | Fuente canónica para elegir agente, modelo, esfuerzo y pases de review. |
 | [`configs/codex/`](configs/codex/AGENTS.md) | Entry point global de Codex y puente Codex → Claude/Opus. |
 | [`configs/claude/`](configs/claude/CLAUDE.md) | Entry point global de Claude Code y puente Claude → Codex. |
-| [`docs/workflows/`](docs/workflows/README.md) | Workflows reutilizables de dominio, issues, implementación, review y feedback. |
 
 ## Contrato común
 
@@ -37,10 +36,13 @@ transportar la tarea; no redefinen esa selección.
   puente `openai/codex-plugin-cc`, el subagente `codex:codex-rescue`, sus
   comandos de seguimiento y el fallback directo al Codex CLI.
 
-Los [workflows reutilizables](docs/workflows/README.md) añaden secuencias de
-implementación, revisión y tracker sin sustituir automáticamente las reglas de
-cada proyecto. Sus módulos GitHub sólo aplican cuando el proyecto declara
-GitHub como tracker.
+## Alcance
+
+Este repositorio define únicamente el contrato de orquestación y la rúbrica de
+routing, que son comunes a cualquier proyecto. Las secuencias de
+implementación, revisión y tracker pertenecen a cada repositorio y se declaran
+en su propio `AGENTS.md`, `CLAUDE.md` o docs locales; mantenerlas aquí
+duplicaría decisiones que sólo el proyecto puede tomar.
 
 ## Instalación manual
 
@@ -49,11 +51,10 @@ desde la raíz de este repositorio, copia de forma interactiva para evitar
 sobrescrituras accidentales:
 
 ```bash
-mkdir -p ~/.agents/docs/orchestration ~/.codex/docs ~/.claude/docs
+mkdir -p ~/.agents/docs ~/.codex/docs ~/.claude/docs
 
 cp -i docs/orchestration.md ~/.agents/docs/orchestration.md
 cp -i docs/agent-routing.md ~/.agents/docs/agent-routing.md
-cp -i docs/workflows/*.md ~/.agents/docs/orchestration/
 
 cp -i configs/codex/AGENTS.md ~/.codex/AGENTS.md
 cp -i configs/codex/docs/claude-workers.md ~/.codex/docs/claude-workers.md
