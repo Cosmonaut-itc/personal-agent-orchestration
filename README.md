@@ -10,6 +10,7 @@ aunque cada harness use un transporte distinto.
 |------|-----------|
 | [`docs/orchestration.md`](docs/orchestration.md) | Contrato común, roles y regla antibucle. |
 | [`docs/agent-routing.md`](docs/agent-routing.md) | Fuente canónica para elegir agente, modelo, esfuerzo y pases de review. |
+| [`docs/cheap-coder-workers.md`](docs/cheap-coder-workers.md) | Guía de transporte del MCP `cheap-coder` (workers baratos qwen3-coder-next). |
 | [`configs/codex/`](configs/codex/AGENTS.md) | Entry point global de Codex y puente Codex → Claude/Opus. |
 | [`configs/claude/`](configs/claude/CLAUDE.md) | Entry point global de Claude Code y puente Claude → Codex. |
 
@@ -55,6 +56,7 @@ mkdir -p ~/.agents/docs ~/.codex/docs ~/.claude/docs
 
 cp -i docs/orchestration.md ~/.agents/docs/orchestration.md
 cp -i docs/agent-routing.md ~/.agents/docs/agent-routing.md
+cp -i docs/cheap-coder-workers.md ~/.agents/docs/cheap-coder-workers.md
 
 cp -i configs/codex/AGENTS.md ~/.codex/AGENTS.md
 cp -i configs/codex/docs/claude-workers.md ~/.codex/docs/claude-workers.md
