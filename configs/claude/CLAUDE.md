@@ -13,3 +13,6 @@ Antes de elegir agente, modelo, review o tratamiento UI/UX, lee
 Para trabajadores Claude usa subagentes nativos. Antes de delegar una tarea o
 un review a GPT mediante Codex por primera vez en la sesión, lee
 `~/.claude/docs/codex-delegation.md`.
+
+Antes de despachar una tarea al worker barato `cheap-coder` (MCP) por primera
+vez en la sesión, lee `~/.agents/docs/cheap-coder-workers.md`.

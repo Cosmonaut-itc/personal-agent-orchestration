@@ -12,3 +12,6 @@ Antes de elegir agente, modelo, review o tratamiento UI/UX, lee
 Para trabajadores GPT usa los subagentes integrados de Codex y sus controles
 de seguimiento. Antes de invocar un trabajador Claude u Opus, lee
 `~/.codex/docs/claude-workers.md`.
+
+Antes de despachar una tarea al worker barato `cheap-coder` (MCP) por primera
+vez en la sesión, lee `~/.agents/docs/cheap-coder-workers.md`.
