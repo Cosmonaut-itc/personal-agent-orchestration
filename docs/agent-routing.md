@@ -36,12 +36,23 @@ flag o herramienta vigente para invocarlo.
 El servidor MCP `cheap-coder` expone qwen3-coder-next como trabajador dentro
 de esta rúbrica, bajo el mismo contrato Despachar → Recoger → Vetar → Cerrar.
 Su valor está en delegar **antes** de gastar tokens premium leyendo el repo.
-Rutéale tareas bien especificadas, verificables mecánicamente y de bajo
-riesgo: exploración de repos (`cheap_coder_explore`), cambios acotados que
-siguen un patrón existente (`cheap_coder_implement`) y tests unitarios o
-reproducción de bugs localizados (`cheap_coder_test`). Las decisiones de
-arquitectura, el código sensible (auth, schema, migraciones), los bugs
-ambiguos y el review final se quedan en los modelos premium de la tabla.
+Rutéale tareas de **alcance cerrado**: las que caben en «aplica este diff
+conceptual y corre este test» — un archivo, criterio de éxito verificable
+mecánicamente, sin juicio de diseño. Ahí sale correcto a la primera y es
+~10-30× más barato que un subagente sonnet: exploración de repos
+(`cheap_coder_explore`), cambios acotados que siguen un patrón existente
+(`cheap_coder_implement`) y tests unitarios o reproducción de bugs
+localizados (`cheap_coder_test`). Las decisiones de arquitectura, el código
+sensible (auth, schema, migraciones), los bugs ambiguos y el review final se
+quedan en los modelos premium de la tabla.
+
+Fuera de ese alcance se degrada de forma predecible y por **tiempo**, no por
+costo: la coherencia entre varios archivos y las decisiones con matices
+alargan la corrida hasta el timeout de pared y dejan un ~90% que el
+orquestador termina rescatando, y ese rescate se come el ahorro. Por eso una
+tarea multi-archivo o con matices se despacha entera a un modelo premium, y el
+worker barato se mantiene fuera de la ruta crítica de un review round, donde
+manda la secuencia gpt-5.6-sol + veto.
 
 Todo lo que un worker barato produce se veta leyendo su diff completo antes
 de integrar. Antes de despachar una tarea al MCP, lee
