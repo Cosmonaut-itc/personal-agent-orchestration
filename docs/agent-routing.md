@@ -10,7 +10,7 @@ de revisión con la misma rúbrica.
 | gpt-5.6-luna  | 10    | 7            | 4     |
 | sonnet-5      | 5     | 5            | 7     |
 | opus-5        | 4     | 8            | 8     |
-| qwen3-coder-next | 10 | 3            | 2     |
+| ox-alpha      | 10    | 9            | 6     |
 
 Elige siempre dentro de esta tabla. El **presupuesto** real son los tokens
 Claude (gpt-5.6 es gratis en la práctica): por defecto gpt-5.6 cuando
@@ -31,28 +31,29 @@ archivo de instrucciones del proyecto marque como alto riesgo.
 La tabla decide el agente; la guía de transporte del harness decide el alias,
 flag o herramienta vigente para invocarlo.
 
-## Worker barato: qwen3-coder-next (cheap-coder)
+## Worker gratis: ox-alpha (cheap-coder)
 
-El servidor MCP `cheap-coder` expone qwen3-coder-next como trabajador dentro
+El servidor MCP `cheap-coder` expone `stealth/ox-alpha` como trabajador dentro
 de esta rúbrica, bajo el mismo contrato Despachar → Recoger → Vetar → Cerrar.
-Su valor está en delegar **antes** de gastar tokens premium leyendo el repo.
-Rutéale tareas de **alcance cerrado**: las que caben en «aplica este diff
-conceptual y corre este test» — un archivo, criterio de éxito verificable
-mecánicamente, sin juicio de diseño. Ahí sale correcto a la primera y es
-~10-30× más barato que un subagente sonnet: exploración de repos
-(`cheap_coder_explore`), cambios acotados que siguen un patrón existente
-(`cheap_coder_implement`) y tests unitarios o reproducción de bugs
-localizados (`cheap_coder_test`). Las decisiones de arquitectura, el código
-sensible (auth, schema, migraciones), los bugs ambiguos y el review final se
-quedan en los modelos premium de la tabla.
+Es gratis por token, así que lo único que gasta una tarea suya es **tiempo de
+pared**: por la regla de la tabla, con inteligencia a la par de gpt-5.6-sol y
+costo 0, es el primer candidato para todo lo que quepa en su transporte.
 
-Fuera de ese alcance se degrada de forma predecible y por **tiempo**, no por
-costo: la coherencia entre varios archivos y las decisiones con matices
-alargan la corrida hasta el timeout de pared y dejan un ~90% que el
-orquestador termina rescatando, y ese rescate se come el ahorro. Por eso una
-tarea multi-archivo o con matices se despacha entera a un modelo premium, y el
-worker barato se mantiene fuera de la ruta crítica de un review round, donde
-manda la secuencia gpt-5.6-sol + veto.
+Ese transporte es el límite real, no la capacidad: solo se le alcanza por las
+tres tools, cada una con su rol, su presupuesto y su worktree aislado —
+exploración de repos (`cheap_coder_explore`), cambios que se despachan como
+encargo autocontenido (`cheap_coder_implement`) y tests o reproducción de bugs
+(`cheap_coder_test`). Lo que exige conversación, juicio de producto, UI/UX o
+un review round se queda en los modelos premium de la tabla; el review final
+lo manda siempre la secuencia gpt-5.6-sol + veto, nunca un worker.
+
+Aún **no tiene perfil observado**: el modelo cambió el 2026-08-21 y la
+telemetría anterior era de qwen3-coder-next. Hasta que haya corridas propias,
+trátalo como capacidad no medida — despacha con criterio de éxito verificable
+y presupuesto de pared corto, para que escale temprano y retomes tú en vez de
+esperar 600 s por un parcial. El código sensible (auth, schema, migraciones)
+sigue pidiendo el mismo pase premium que exige la política del proyecto,
+delegado o no.
 
 Todo lo que un worker barato produce se veta leyendo su diff completo antes
 de integrar. Antes de despachar una tarea al MCP, lee

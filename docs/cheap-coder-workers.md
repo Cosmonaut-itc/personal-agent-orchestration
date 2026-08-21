@@ -1,8 +1,8 @@
 # Workers baratos: cheap-coder
 
 Guía de transporte del servidor MCP `cheap-coder` (repo
-`~/VSCODE/REPOS/cheap-coder-mcp`): qwen3-coder-next vía OpenRouter con pin a
-Parasail, registrado en Claude Code (scope user) y en Codex. La rúbrica de
+`~/VSCODE/REPOS/cheap-coder-mcp`): `stealth/ox-alpha` vía OpenRouter con pin
+al provider Stealth, registrado en Claude Code (scope user) y en Codex. La rúbrica de
 `agent-routing.md` decide *cuándo* delegar aquí; este archivo define *cómo*.
 Cada delegación sigue el contrato Despachar → Recoger → Vetar → Cerrar de
 `orchestration.md`.
@@ -17,19 +17,16 @@ Cada delegación sigue el contrato Despachar → Recoger → Vetar → Cerrar de
 
 ## Perfil observado
 
-| Encargo | Tiempo | Costo | Tool calls | Salida |
-|---------|--------|-------|------------|--------|
-| Fix mecánico, 1 archivo | 28 s | ~$0.02 | 9 | correcto a la primera |
-| Fix acotado, varios archivos chicos | 197 s | $0.13 | 36 | correcto; sin commit y con un summary no pedido |
-| Fix multi-archivo con matices | agotó los 600 s de pared | $0.77 | 115 | ~90%, con 4 defectos rescatados por el orquestador |
+**Sin perfil todavía.** El worker cambió a `stealth/ox-alpha` el 2026-08-21 y
+la telemetría acumulada hasta esa fecha es de qwen3-coder-next: no se
+transfiere. Trátalo como capacidad no medida hasta que haya corridas propias
+en `telemetry/usage.jsonl` — despacha primero encargos con criterio de éxito
+verificable y veta el diff completo, que es lo que produce esa medición.
 
-Con caching una tarea del primer tipo baja a ~$0.004–0.01. La degradación es
-por **tiempo**: el costo sigue siendo trivial en absoluto, pero la ambigüedad
-y la coherencia entre archivos alargan la corrida hasta el timeout. Ese
-presupuesto de pared es la palanca de control — dale uno corto para que
-escale temprano y retomes tú, en vez de pagar 600 s por un 90%. Como fuente
-barata de telemetría para benchmarks rinde bien; como worker de confianza,
-todavía no.
+Lo que sí cambia por diseño: el modelo es **gratis** (0 por token en
+OpenRouter), así que el único presupuesto que gasta una tarea es el **tiempo
+de pared**. Ese es la palanca de control — dale uno corto para que escale
+temprano y retomes tú, en vez de esperar 600 s por un parcial.
 
 ## Despachar
 
@@ -64,11 +61,13 @@ Las tres tools devuelven el mismo Envelope (`structuredContent`):
 ## Vetar y cerrar
 
 Lee el diff completo del worktree antes de integrar — siempre; es la mitad
-premium del trato. Los defectos que sobreviven son de forma, no de lógica:
-rutas mal prefijadas, nombres fuera de la convención del repo, aserciones
-faltantes en tests que declara escritos y docs actualizadas a medias; revisa
-eso primero. Puede además dejar el cambio sin commitear y sumar un summary
-que nadie pidió, así que el diff es la verdad, no la branch ni el reporte.
+premium del trato. Con el modelo anterior los defectos que sobrevivían eran
+de forma, no de lógica: rutas mal prefijadas, nombres fuera de la convención
+del repo, aserciones faltantes en tests que declaraba escritos y docs
+actualizadas a medias. Sigue revisando eso primero, pero sin darlo por el
+patrón del modelo actual, que aún no tiene perfil. Un worker puede además
+dejar el cambio sin commitear y sumar un summary que nadie pidió, así que el
+diff es la verdad, no la branch ni el reporte.
 Integra solo lo validado (merge/cherry-pick de la branch o aplicando el diff)
 y al cerrar elimina worktree y branch
 (`git worktree remove <path> && git branch -D cheap-coder/task-<id>`).
@@ -79,5 +78,6 @@ y al cerrar elimina worktree y branch
   delega solo sobre repos confiables y tareas sin secretos en juego.
 - En Codex, `tool_timeout_sec` debe superar el presupuesto de pared de la
   tarea (instalado: 900 s); el default de 60 s cortaría cualquier tarea real.
-- `telemetry.provider` reporta `openrouter`, no el upstream real (Parasail);
-  verifica el caching por `cacheReadTokens`/`costUsd`, no por ese campo.
+- `telemetry.provider` reporta `openrouter`, no el upstream real (Stealth);
+  verifica el caching por `cacheReadTokens`, no por ese campo. `costUsd` es 0
+  mientras el modelo sea gratis, así que ya no sirve como señal de nada.
