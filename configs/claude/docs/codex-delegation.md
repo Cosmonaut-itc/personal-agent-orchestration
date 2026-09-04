@@ -1,94 +1,151 @@
-# Trabajadores Codex desde Claude Code
+# Trabajadores GPT desde Claude Code
 
-Esta guía cubre la mecánica Claude → Codex. La política, los roles y el cierre
-viven en `~/.agents/docs/orchestration.md`.
+Ruta **Claude Code → GPT**. Patrón común de esta ruta: **el exit code
+miente**. Veta un despacho por `git status`, por el entregable y por las
+llamadas de herramienta que completó, nunca por el exit.
 
-Antes de elegir el trabajador, lee `~/.agents/docs/agent-routing.md`; después
-usa este archivo sólo para transportarlo hacia Codex.
+## Runtime del plugin
 
-El puente vigente es el plugin habilitado
-[openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc), que usa el
-Codex CLI y su app server locales. Antes del primer despacho de una sesión,
-ejecuta `/codex:setup` para comprobar instalación y autenticación.
+Antes del primer despacho de la sesión ejecuta `/codex:setup` para comprobar
+instalación y autenticación del plugin
+[openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc).
 
-## Transporte principal
+Localiza el script `codex-companion.mjs` dentro de la versión instalada del
+plugin (bajo `~/.claude/plugins/cache/openai-codex/codex/<versión>/scripts/`)
+y resuelve la versión en cada sesión. Ejecutar el script **sin argumentos**
+imprime el usage; `task` trata cualquier texto como prompt, incluido
+`--help`, y lanza un turno real de Codex.
 
-Para un handoff que Claude debe revisar dentro de su flujo de orquestación,
-invoca el subagente nativo `codex:codex-rescue` mediante la herramienta Agent.
-Es un forwarder delgado: transporta la tarea al runtime Codex y devuelve su
-stdout. Claude conserva el resultado, lo veta conforme al contrato y sólo
-después integra o cierra.
+Prefiere invocar `task` directamente desde Bash: permite pasar modelo,
+esfuerzo y contexto explícitos y el mismo controlador lanza y recoge el trabajo
+sin consumir un trabajador Claude como adaptador.
 
-El shortcut `/codex:rescue` usa el mismo subagente, pero su interfaz devuelve
-la salida de Codex verbatim. Úsalo cuando ese handoff textual sea el resultado
-esperado; el veto del orquestador ocurre antes de integrar o afirmar cierre.
-
-Comandos instalados:
-
-| Necesidad | Comando |
-|-----------|---------|
-| Tarea o diagnóstico | `/codex:rescue [--wait\|--background] [--fresh\|--resume] [--model <model>] [--effort <effort>] <task>` |
-| Review del estado git | `/codex:review [--wait\|--background] [--base <ref>] [--scope auto\|working-tree\|branch]` |
-| Review de enfoque/diseño | `/codex:adversarial-review [mismos flags] [focus ...]` |
-| Seguimiento | `/codex:status [job-id] [--wait] [--timeout-ms <ms>] [--all]` |
-| Resultado o cancelación | `/codex:result [job-id]` · `/codex:cancel [job-id]` |
-| Continuidad en Codex | `/codex:transfer [--source <claude-jsonl>]` |
-
-Los comandos de review y resultado también presentan la salida Codex sin
-vetarla. Claude lee esa salida, contrasta cada hallazgo con el diff y cierra
-según `~/.agents/docs/orchestration.md`.
-
-## Tarea autocontenida
-
-Codex no ve la conversación Claude. Construye el prompt con todos los campos
-de **Despachar** definidos en `~/.agents/docs/orchestration.md`. Declara que
-Codex actúa como trabajador: resuelve y reporta directamente, sin invocar
-Claude ni abrir un puente de vuelta.
-
-Elige read-only para investigación, análisis y review. Usa escritura sólo
-cuando el encargo la autorice; el plugin rescue es write-capable por default,
-así que expresa read-only de forma explícita cuando corresponda. Para escritura,
-prefiere un worktree aislado; si debe compartir checkout, captura primero
-`git status` y el diff existente para proteger trabajo ajeno.
-
-## Fallback directo
-
-Cuando el plugin no cubra el caso o esté indisponible, usa el CLI verificado:
+Patrón verificado en la versión 1.0.5; confirma su vigencia con el usage:
 
 ```bash
-codex exec \
-  -C <repo> \
-  -s read-only \
-  --ephemeral \
-  -m <model> \
-  -c 'model_reasoning_effort="high"' \
-  "TASK"
+node "$companion_path" task \
+  --cwd "$checkout_path" \
+  --model "$worker_model" \
+  --effort "$worker_effort" \
+  --prompt-file "$brief_path" \
+  --json
 ```
 
-Cambia a `-s workspace-write` sólo para una tarea de escritura autorizada.
-Usa `--json`, `-o <file>` o `--output-schema <file>` cuando el consumidor
-necesite salida estructurada. Para seguimiento con contexto, usa
-`codex exec resume --last "FOLLOW-UP"`.
+Para background añade `--background`, conserva el job ID y consulta `status`
+y `result` con ese ID hasta el resultado terminal; detén con `cancel` y
+confirma el estado. Si reanudas con `--resume-last`, verifica qué hilo se
+retoma y vuelve a pasar modelo y esfuerzo.
 
-Selecciona modelo y esfuerzo según `~/.agents/docs/agent-routing.md`. Pasa esos
-flags explícitamente cuando la rúbrica lo requiera; en los demás casos puede
-gobernar la configuración Codex vigente.
+## Adaptador opcional
 
-## Validación y límites
+El subagente `codex:codex-rescue` es un adaptador de ruta prescrita: un
+wrapper que reenvía a `task` y devuelve su stdout. Su definición deja modelo y
+esfuerzo sin fijar salvo petición explícita, activa `--write` por defecto y
+devuelve **vacío** si la invocación falla. Si lo usas, pásale modelo, esfuerzo
+y read-only de forma explícita y comprueba que los reenvía. Un resultado vacío
+es fallo de transporte, no ausencia de hallazgos.
 
-- Claude espera el estado terminal, inspecciona stdout/resultado y verifica el
-  diff y los gates aplicables. Un payload correcto no prueba por sí solo que la
-  acción ocurrió.
-- Un job en background se cierra con `status` + `result`, o se detiene con
-  `cancel`; no se abandona como sustituto de cierre.
-- El fallback directo no aporta lifecycle integrado: Claude impone un tiempo
-  máximo, conserva stdout/stderr y termina el proceso si excede el límite.
-- El plugin comparte instalación, auth, checkout y configuración del Codex CLI
-  local. Sus jobs no son subagentes Claude de propósito general: el rescue es
-  deliberadamente un transporte delgado.
+Úsalo sólo para trabajo read-only: en modo background el subagente retorna
+antes de que termine el job y su proceso hijo muere con él, mientras el JSON
+de estado sigue diciendo `running`. Para saber si un job del plugin vive,
+mira su `pid` con `ps -p` y la frescura de su `.log` bajo
+`~/.claude/plugins/data/codex-openai-codex/state/<repo>/jobs/`.
+
+Los comandos `/codex:review` y `/codex:adversarial-review` usan otro recorrido
+con parámetros propios. Para una revisión con modelo y esfuerzo controlados,
+usa `task` read-only con un brief de revisión.
+
+## CLI alternativo
+
+Si el runtime del plugin no cubre el encargo, usa el CLI. Comprueba
+`codex exec --help`; patrón verificado en codex-cli 0.153.3:
+
+```bash
+timeout --signal=KILL "$max_secs" codex exec \
+  -C "$checkout_path" \
+  -s read-only \
+  -m "$worker_model" \
+  -c "model_reasoning_effort=\"$worker_effort\"" \
+  --json \
+  - < "$brief_path"
+```
+
+- **Stdin.** Sin TTY, `codex exec` puede quedarse en «Reading additional
+  input from stdin...» para siempre, o salir con exit 0 sin hacer nada. Pasa
+  siempre el prompt por stdin explícito (`- < brief`) o redirige `</dev/null`.
+- **Modelo.** Un alias corto (`sol`) o cualquier `-m` no soportado devuelve
+  `400 ... not supported` y **exit 0** con el árbol intacto. Usa el nombre
+  completo (`gpt-5.6-sol`).
+- **Flags.** Un flag inválido (`--search` no existe) falla en el parseo con
+  exit 0 y un output de pocas líneas. La búsqueda web se controla por
+  `web_search` en `config.toml`.
+- **Directorio confiable.** `-C` debe apuntar a un repo confiado; `-C /tmp`
+  falla con «Not inside a trusted directory».
+- **Salida.** Usa `-o <file>` o `--output-schema <file>` cuando el consumidor
+  necesite salida estructurada.
+- **Reanudar.** `codex exec resume <session-id>` rechaza `-s`, `-m`, `-o` y
+  `-C`: hereda el modelo, toma sandbox y esfuerzo por `-c`, y escribe sólo en
+  el cwd desde el que se lanza, así que entra al worktree antes. Evita
+  `resume --last` si corrieron varios hilos en la sesión. El session id está
+  en el banner del output. Añade `--ephemeral` sólo a reviews y consultas:
+  sin rollout no hay `resume`.
+
+## Escritura
+
+Por defecto todo despacho es read-only (`task` sin `--write`, CLI con
+`-s read-only`). Habilita escritura sólo para el encargo autorizado, en un
+worktree; si debe compartir checkout, commitea un punto de recuperación
+antes. En el CLI, `-s workspace-write` no trae red;
+`-c 'sandbox_workspace_write.network_access=true'` la habilita.
+
+- **Commits.** En `workspace-write` el trabajador no puede commitear
+  (`index.lock`); el orquestador commitea. El brief fija que el árbol de
+  partida es correcto y que el trabajador sólo edita archivos; git lo gestiona
+  el orquestador. Guardarraíl explícito en el brief: sin `git checkout`,
+  `git restore` ni `git reset`, porque un trabajador ya borró trabajo sin
+  commitear con ellos.
+- **Descartar.** Para descartar cambios de un trabajador, guárdalos primero
+  con stash o commit; la restauración directa sobre su árbol los pierde.
+- **Suites largas.** Un timeout a mitad de una suite completa deja el árbol
+  sin commitear a medias. Pide tests dirigidos y corre la suite completa tú.
+
+## Gotchas de ejecución
+
+Observados en Codex CLI 0.145 a 0.153.
+
+- **Pide aprobación.** Con `default_mode_request_user_input` activo, el
+  trabajador propone su plan, pregunta «¿Apruebas?» y sale con exit 0 sin
+  escribir. Todo brief de implementación lleva un apartado «Autorización
+  previa»: encargo aprobado, diseño ya autorizado, checkout correcto tal como
+  está, procede sin pedir confirmación. Si ya pasó, `resume` con «aprobado,
+  procede» conserva el contexto.
+- **Delegación interna.** Sol abre subagentes `collab` por su cuenta y agota
+  el timeout. El brief dice «trabaja tú solo, sin subagentes ni collab, tienes
+  N minutos»; parte lotes grandes.
+- **Filtro de contenido.** Vocabulario de seguridad («adversarial», «bypass»,
+  «atacante», «fail-open», «modelo de amenaza») mata el run con exit 0 o 1 y
+  un mensaje de «cybersecurity risk». Redacta en registro de QA e integridad
+  de datos; tras un flag relanza en sesión fresca, no con `resume`.
+- **Muere tras una herramienta.** A veces todo despacho termina en ~1 min con
+  exit 0 y ≤1 llamada de herramienta, aunque un ping responda. Cuenta las
+  llamadas de herramienta en el output; al segundo intento así, escala según
+  routing en vez de reintentar.
+- **Timeouts.** Envuelve siempre en `timeout --signal=KILL`. El `timeout` del
+  Bash de Claude Code se limita a 600 s, y `run_in_background` muere a los
+  ~20 min con su hijo. Para runs largos, daemoniza con `python3` +
+  `subprocess.Popen(..., start_new_session=True)` (macOS no tiene `setsid`),
+  deja un done-file y sondea con Monitor. El tell del cuelgue real es 0 % CPU,
+  no el tiempo transcurrido; un timeout que mata un run productivo cuesta más
+  que esperar.
+- **Cuota.** No asumas el estado de la cuota en ninguna dirección. Antes de
+  despachar en volumen, un ping real con esfuerzo low; si falla por límite,
+  el fallback es Claude según routing.
+- **Procesos.** La app de ChatGPT trae su propio binario `codex`: para contar
+  o matar workers usa `pgrep -f "codex exec"` y la edad del output, no
+  `pgrep -x codex`.
 
 Referencias primarias:
 
 - [Codex CLI](https://developers.openai.com/codex/cli/)
-- [Codex app server](https://developers.openai.com/codex/app-server/)
 - [Referencia de `codex exec`](https://developers.openai.com/codex/cli/reference/)
+- [Codex app server](https://developers.openai.com/codex/app-server/)

@@ -1,95 +1,56 @@
 # Trabajadores Claude desde Codex
 
-Esta guía cubre la mecánica Codex → Claude. La política y el criterio de cierre
-viven en `~/.agents/docs/orchestration.md`.
+Ruta **Codex → Claude** mediante un proceso externo `claude -p`.
 
-Antes de elegir el trabajador, lee `~/.agents/docs/agent-routing.md`; después
-usa este archivo sólo para transportarlo hacia Claude.
+## Preparar y lanzar
 
-`claude -p` ejecuta un proceso Claude Code no interactivo. Es un trabajador
-externo: no hereda las herramientas integradas de subagentes de Codex ni
-aparece como uno de sus threads.
+Antes de la primera invocación, comprueba `claude --version` y `claude --help`.
+Los nombres de routing `opus-5` y `sonnet-5` se pasan con los alias `opus` y
+`sonnet`.
 
-## Disponibilidad
+El modo `-p` **omite el diálogo de confianza del workspace**: ejecuta sólo
+desde directorios confiables y entrega por stdin sólo material confiable.
 
-Antes de la primera invocación de una tarea, comprueba sin iniciar trabajo:
+`--safe-mode` conserva auth, modelo, herramientas integradas y permisos, pero
+desactiva CLAUDE.md, skills, plugins, hooks, MCP y agentes personalizados. El
+trabajador no recarga la política del orquestador, así que el brief debe
+contener sus restricciones y referencias; si un documento local no le es
+accesible, incluye su contenido pertinente.
 
-```bash
-command -v claude
-claude --version
-claude --help
-```
-
-El patrón actual requiere `-p`, `--safe-mode`, `--permission-mode`, `--tools`,
-`--output-format` y `--no-session-persistence`. `--safe-mode` conserva auth,
-modelo, herramientas integradas y permisos, pero desactiva CLAUDE.md, skills,
-plugins, hooks, MCP, comandos y agentes personalizados. Así el trabajador no
-recarga la política del orquestador ni forma un ciclo.
-
-## Patrón por defecto
-
-Para investigación read-only del repositorio:
+Patrón de lectura; sustituye las variables por los valores seleccionados:
 
 ```bash
-claude --safe-mode -p \
-  --model opus \
-  --effort high \
+env CLAUDE_CODE_EFFORT_LEVEL="$worker_effort" \
+  claude --safe-mode -p \
+  --model "$worker_model" \
+  --effort "$worker_effort" \
   --permission-mode dontAsk \
   --tools "Read,Grep,Glob" \
   --output-format json \
   --no-session-persistence \
-  "TASK"
+  < "$brief_path"
 ```
 
-Los nombres de routing `sonnet-5` y `opus-5` se invocan aquí mediante los
-aliases Claude Code `sonnet` y `opus`: la tabla decide el agente y esta guía
-decide el flag operativo.
+La variable de entorno y el flag fijan el mismo esfuerzo para que un valor
+heredado no lo sustituya. Cuando todo el material llega por stdin, usa
+`--tools ""`. `--tools` omite `Agent`: el trabajador no puede abrir otra
+delegación salvo que el despacho autorice descendientes controlados.
 
-`TASK` debe ser autocontenida y decir que el proceso actúa como trabajador
-final: resuelve directamente, devuelve evidencia y no delega. `--tools` omite
-`Agent`, por lo que el trabajador no puede abrir otra delegación.
+Para escritura autorizada usa un worktree, `--permission-mode acceptEdits` y
+reglas `--allowedTools` precisas para shell. La alternativa `--bare` no usa
+OAuth ni keychain: requiere `ANTHROPIC_API_KEY` o `apiKeyHelper`.
 
-Cuando todo el material ya llega por stdin, usa `--tools ""` en el mismo
-patrón. Codex entrega sólo datos confiables por stdin y ejecuta `-p` únicamente
-desde un directorio confiable: el modo no interactivo omite el diálogo de
-confianza del workspace.
+## Recoger
 
-## Escritura
+Conserva PID, salida y código de terminación. Exige salida cero y JSON
+parseable; valida `result` contra los criterios de aceptación e inspecciona
+el diff si hubo cambios. Salida cero y JSON válido no prueban aceptación, y
+una respuesta textual no prueba que una edición o un test ocurrió.
 
-Un trabajador con escritura requiere autorización explícita, un worktree
-aislado y una superficie definida por la tarea. Selecciona sólo las
-herramientas necesarias; usa `acceptEdits` para edición de archivos y reglas
-`--allowedTools` precisas para comandos de shell. Conserva read-only como
-default cuando la tarea es review, investigación o diseño.
+No hay steering ni lifecycle integrado: el controlador gestiona timeout y
+cancelación. El modo efímero no reanuda historial; para corregir, envía un
+nuevo brief con la evidencia previa.
 
-La alternativa portable para automatización es `--bare`, recomendada por
-Anthropic para scripts. `--bare` no usa OAuth ni el keychain: requiere
-`ANTHROPIC_API_KEY`, `apiKeyHelper` o credenciales del proveedor configurado.
-
-## Validación y cierre
-
-Codex:
-
-1. exige código de salida cero y JSON parseable;
-2. valida `result` contra el objetivo y los criterios de aceptación;
-3. inspecciona el diff y ejecuta los gates aplicables si hubo cambios;
-4. reorienta o repite un resultado insuficiente y termina el proceso al cerrar.
-
-Una respuesta textual correcta no prueba que una edición o un test ocurrió.
-El controlador verifica esa evidencia en el sistema correspondiente.
-
-## Límites reales
-
-- No hay steering, mailbox ni lifecycle integrado entre Codex y el proceso
-  Claude; el controlador debe manejar stdin/stdout, timeout y cancelación.
-- `--agents` define subagentes internos de Claude y `--agent` cambia el agente
-  principal. No son necesarios para un único trabajador Opus y amplían el
-  árbol fuera de la observabilidad de Codex.
-- Los permisos de Codex no se transfieren al proceso. La invocación Claude
-  define los suyos de forma independiente para cada tarea.
-
-Referencias primarias:
-
-- [Claude Code no interactivo](https://code.claude.com/docs/en/headless)
-- [Permisos de Claude Code](https://code.claude.com/docs/en/permissions)
-- [Subagentes de Claude Code](https://code.claude.com/docs/en/sub-agents)
+Referencias: [no interactivo](https://code.claude.com/docs/en/headless),
+[permisos](https://code.claude.com/docs/en/permissions),
+[esfuerzo](https://code.claude.com/docs/en/model-config#effort-level).

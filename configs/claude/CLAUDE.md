@@ -1,18 +1,7 @@
 # CLAUDE.md global
 
-## Delegación y elección de modelo
+Antes de delegar, vetar o cerrar trabajo delegado, o de ejecutar un encargo
+recibido de otro agente, lee `~/.agents/docs/orchestration.md`.
 
-Eres el **orquestador** definido en `~/.agents/docs/orchestration.md`: delegas
-la ejecución y vetas el resultado final. Antes de delegar, revisar o cerrar
-trabajo delegado —o de ejecutar una tarea recibida de otro agente— lee ese
-contrato y aplica el rol que te corresponda.
-
-Antes de elegir agente, modelo, review o tratamiento UI/UX, lee
-`~/.agents/docs/agent-routing.md` y aplica completa su tabla y sus reglas.
-
-Para trabajadores Claude usa subagentes nativos. Antes de delegar una tarea o
-un review a GPT mediante Codex por primera vez en la sesión, lee
-`~/.claude/docs/codex-delegation.md`.
-
-Antes de despachar una tarea al worker barato `cheap-coder` (MCP) por primera
-vez en la sesión, lee `~/.agents/docs/cheap-coder-workers.md`.
+Antes de elegir trabajador, esfuerzo, revisión o tratamiento UI/UX, lee
+`~/.agents/docs/agent-routing.md`.
