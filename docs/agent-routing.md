@@ -36,6 +36,12 @@ cada modelo. El esfuerzo sigue la incertidumbre del encargo, no su tamaño.
 | medium | Hace falta interpretar, planificar o comparar alternativas; punto de partida habitual. |
 | high | Persisten incertidumbres importantes o se necesita razonamiento profundo. |
 
+**gpt-6-astra se calibra un escalón por debajo.** Astra en low rinde más que
+Sol en high, según [OpenAI](https://x.com/thsottiaux/status/2096688770523467947).
+Con Astra, `low` es el punto de partida habitual y `medium` cubre lo que con
+Sol pedía `high`; reserva `high` para incertidumbres que medium no resolvió.
+Un encargo que migra de Sol a Astra baja uno o dos niveles, no los conserva.
+
 El tope de cualquier despacho, sea quien sea el trabajador y aunque reanude,
 es **high**.
 
