@@ -8,11 +8,11 @@ harness use un transporte distinto.
 
 | Ruta | Propósito |
 |------|-----------|
-| [`docs/orchestration.md`](docs/orchestration.md) | Contrato común, roles, descendientes y cierre. |
+| [`docs/orchestration.md`](docs/orchestration.md) | Fuente canónica del contrato común: roles, descendientes y cierre. |
 | [`docs/agent-routing.md`](docs/agent-routing.md) | Tabla de modelos, esfuerzo, escalado, review y UI/UX. |
 | [`docs/native-subagents.md`](docs/native-subagents.md) | Contexto, configuración y seguimiento de subagentes nativos en Codex y Claude Code. |
-| [`configs/codex/`](configs/codex/AGENTS.md) | Entry point global de Codex y guía Codex → Claude. |
-| [`configs/claude/`](configs/claude/CLAUDE.md) | Entry point global de Claude Code y guía Claude Code → GPT. |
+| [`configs/codex/`](configs/codex/AGENTS.md) | Entry point global de Codex, con el contrato inlineado, y guía Codex → Claude. |
+| [`configs/claude/`](configs/claude/CLAUDE.md) | Entry point global de Claude Code, con el contrato inlineado, y guía Claude Code → GPT. |
 
 ## Contrato común
 
@@ -21,8 +21,12 @@ del resultado final, del **trabajador**, que resuelve el encargo, y del
 **adaptador**, que transporta una ruta prescrita. Cada delegación pasa por
 **Despachar → Recoger → Vetar → Cerrar**.
 
+Los entrypoints globales llevan ese contrato inlineado, de modo que rige desde
+el primer turno sin una lectura previa. `docs/orchestration.md` es la fuente
+canónica: al editarlo, replica el cambio en ambos entrypoints.
+
 El [routing](docs/agent-routing.md) es la única fuente para elegir modelo,
-esfuerzo y pases de review. Los entrypoints apuntan a la política; las guías
+esfuerzo y pases de review. Los entrypoints apuntan a esa política; las guías
 describen cómo ejecutarla en cada entorno.
 
 ## Rutas de ejecución

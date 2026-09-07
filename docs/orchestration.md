@@ -1,6 +1,9 @@
 # Contrato de orquestación
 
-Contrato común para Codex y Claude Code.
+Contrato común para Codex y Claude Code, y fuente canónica de este texto.
+Se replica íntegro en los entrypoints globales `~/.codex/AGENTS.md` y
+`~/.claude/CLAUDE.md`, que lo cargan sin lectura previa: al cambiar este
+documento, actualiza también ambas copias.
 
 ## Roles
 
