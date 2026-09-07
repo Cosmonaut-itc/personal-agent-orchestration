@@ -9,18 +9,28 @@ operativas (10 = mejor) y se ajustan con resultados observados.
 
 | Modelo        | costo | inteligencia | gusto | Cuándo |
 |---------------|-------|--------------|-------|--------|
-| gpt-6-astra   | 7     | 10           | 7     | Razonamiento y juicio difícil; primer pase de revisión. |
-| gpt-5.6-sol   | 8     | 9            | 6     | Opción habitual para ejecución técnica. |
+| gpt-6-astra   | 5     | 10           | 7     | Razonamiento y juicio difícil; primer pase de revisión. |
+| gpt-5.6-sol   | 6     | 9            | 6     | Opción habitual para ejecución técnica. |
 | gpt-5.6-terra | 9     | 8            | 5     | Alternativa a Sol cuando el proyecto o el transporte lo favorezcan. |
 | gpt-5.6-luna  | 10    | 7            | 4     | Encargos claros y fáciles de verificar. |
 | opus-5        | 4     | 8            | 8     | Gusto visual, decisiones de producto y contraste independiente de alto riesgo. |
 | sonnet-5      | 5     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
 
-El **presupuesto** real son los tokens Claude: GPT es gratis en la práctica.
-Por defecto GPT cuando plausiblemente da la talla; gasta Claude donde el gusto,
-el entorno o una perspectiva independiente pagan. En conflicto sobre algo que
-se embarca: **inteligencia > gusto > costo**. La elección explícita del
-usuario prevalece.
+Ninguna ruta es gratis. Los tokens Claude siguen siendo el recurso más caro,
+pero astra y sol consumen una cuota propia que se agota: más baratos que Opus,
+no ilimitados. El **presupuesto** son dos monedas limitadas, no una gratis y
+una cara.
+
+Para ejecución, parte del modelo más barato que plausiblemente dé la talla y
+sube por escalado en vez de abrir con el más capaz; los pases obligatorios de
+revisión siguen su propia sección. Gasta Claude donde el gusto, el entorno o
+una perspectiva independiente pagan.
+
+Compara el costo del despacho completo, no el precio nominal del modelo: astra
+en `low` puede salir más barato que sol en `high` para el mismo resultado, y un
+despacho barato que hay que repetir cuesta más que el caro que cierra. En
+conflicto sobre algo que se embarca: **inteligencia > gusto > costo**. La
+elección explícita del usuario prevalece.
 
 El MCP `cheap-coder` (`stealth/ox-alpha`) está **deprecado por ahora**: sus
 tools pueden aparecer en la sesión, pero no están en la tabla.
