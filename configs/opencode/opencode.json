@@ -1,0 +1,99 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "cheap-coder-deepseek": {
+      "description": "Encargos técnicos acotados; verificar promoción y cuota Go.",
+      "model": "opencode-go/deepseek-v4.1-flash",
+      "mode": "all",
+      "steps": 20,
+      "prompt": "{file:./worker-prompt.md}",
+      "permission": {
+        "*": "deny",
+        "read": {
+          "*": "allow",
+          "*.env": "deny",
+          "*.env.*": "deny",
+          "*.pem": "deny"
+        },
+        "glob": "allow",
+        "grep": "allow",
+        "task": "deny",
+        "external_directory": "deny"
+      },
+      "reasoningEffort": "low",
+      "thinking": {
+        "type": "enabled"
+      }
+    },
+    "cheap-coder-minimax": {
+      "description": "Implementación frontend/backend contra diseño aprobado.",
+      "model": "opencode-go/minimax-m3",
+      "mode": "all",
+      "steps": 20,
+      "prompt": "{file:./worker-prompt.md}",
+      "permission": {
+        "*": "deny",
+        "read": {
+          "*": "allow",
+          "*.env": "deny",
+          "*.env.*": "deny",
+          "*.pem": "deny"
+        },
+        "glob": "allow",
+        "grep": "allow",
+        "task": "deny",
+        "external_directory": "deny"
+      },
+      "thinking": {
+        "type": "adaptive"
+      }
+    },
+    "cheap-coder-kimi": {
+      "description": "Encargos complejos y contexto amplio; habilitar tras validar razonamiento low/high en Go.",
+      "model": "opencode-go/kimi-k3",
+      "mode": "all",
+      "steps": 20,
+      "prompt": "{file:./worker-prompt.md}",
+      "permission": {
+        "*": "deny",
+        "read": {
+          "*": "allow",
+          "*.env": "deny",
+          "*.env.*": "deny",
+          "*.pem": "deny"
+        },
+        "glob": "allow",
+        "grep": "allow",
+        "task": "deny",
+        "external_directory": "deny"
+      },
+      "disable": true,
+      "thinking": {
+        "type": "enabled"
+      },
+      "reasoningEffort": "low"
+    }
+  },
+  "provider": {
+    "opencode-go": {
+      "models": {
+        "kimi-k3": {
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "max": {
+              "disabled": true
+            },
+            "xhigh": {
+              "disabled": true
+            }
+          }
+        }
+      }
+    }
+  }
+}

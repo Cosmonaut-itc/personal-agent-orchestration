@@ -11,8 +11,10 @@ harness use un transporte distinto.
 | [`docs/orchestration.md`](docs/orchestration.md) | Fuente canónica del contrato común: roles, descendientes y cierre. |
 | [`docs/agent-routing.md`](docs/agent-routing.md) | Tabla de modelos, esfuerzo, escalado, review y UI/UX. |
 | [`docs/native-subagents.md`](docs/native-subagents.md) | Contexto, configuración y seguimiento de subagentes nativos en Codex y Claude Code. |
+| [`docs/opencode-workers.md`](docs/opencode-workers.md) | Despacho programático de cheap coders Go: CLI/HTTP, modelo, controles y cierre. |
 | [`configs/codex/`](configs/codex/AGENTS.md) | Entry point global de Codex, con el contrato inlineado, y guía Codex → Claude. |
 | [`configs/claude/`](configs/claude/CLAUDE.md) | Entry point global de Claude Code, con el contrato inlineado, y guía Claude Code → GPT. |
+| [`configs/opencode/`](configs/opencode/opencode.json) | Perfiles DeepSeek V4.1 Flash, MiniMax M3 y Kimi K3, con instrucciones compartidas. |
 
 ## Contrato común
 
@@ -37,12 +39,13 @@ describen cómo ejecutarla en cada entorno.
 | Claude Code → Claude | Subagentes nativos de Claude Code. | [`native-subagents.md`](docs/native-subagents.md), rama Claude Code |
 | Codex → Claude | Proceso externo `claude -p`, seguido hasta su terminación. | [`claude-workers.md`](configs/codex/docs/claude-workers.md) |
 | Claude Code → GPT | Runtime del plugin openai/codex-plugin-cc, adaptador opcional o CLI de Codex. | [`codex-delegation.md`](configs/claude/docs/codex-delegation.md) |
+| Codex o Claude Code → OpenCode Go | `opencode run` con perfil/modelo explícitos; servidor HTTP para despacho asíncrono. | [`opencode-workers.md`](docs/opencode-workers.md) |
 
 Un trabajador externo por CLI tiene un ciclo de vida distinto del subagente
 nativo. Cada guía explica qué contexto y controles ofrece.
 
-El MCP `cheap-coder` (`stealth/ox-alpha`) está **deprecado por ahora**: el
-routing prohíbe despachar por sus tools. Para retirarlo del equipo:
+El MCP antiguo `cheap-coder` (`stealth/ox-alpha`) sigue **deprecado**. Los
+perfiles Go usan OpenCode y no reactivan ese MCP. Para retirar el antiguo:
 
 ```bash
 claude mcp remove cheap-coder -s user
@@ -67,6 +70,7 @@ mkdir -p ~/.agents/docs ~/.codex/docs ~/.claude/docs
 cp -i docs/orchestration.md ~/.agents/docs/orchestration.md
 cp -i docs/agent-routing.md ~/.agents/docs/agent-routing.md
 cp -i docs/native-subagents.md ~/.agents/docs/native-subagents.md
+cp -i docs/opencode-workers.md ~/.agents/docs/opencode-workers.md
 rm -f ~/.agents/docs/cheap-coder-workers.md
 
 cp -i configs/codex/AGENTS.md ~/.codex/AGENTS.md
@@ -80,3 +84,21 @@ Instala también las guías referenciadas: cambiar sólo los entrypoints dejarí
 apuntadores incompletos. Acepta cada reemplazo cuando el diff corresponda a la
 configuración que quieres activar. Editar este repositorio no cambia los
 archivos ya instalados en tu equipo.
+
+### Perfiles OpenCode Go
+
+Los perfiles requieren OpenCode y el proveedor Go conectado. Conserva el
+archivo de configuración existente: combina la clave `agent` y las variantes
+de `provider.opencode-go.models.kimi-k3` de
+[`configs/opencode/opencode.json`](configs/opencode/opencode.json) con la
+configuración global o del proyecto, y copia `worker-prompt.md` junto al JSON
+para resolver su referencia relativa. Revisa colisiones de nombres antes de
+combinar. No reemplaces proveedores, MCP ni otras preferencias existentes.
+
+Los perfiles parten de lectura y búsqueda; los permisos de implementación
+se fijan por encargo mediante overrides de ejecución. Kimi permanece
+deshabilitado hasta validar que Go aplica el esfuerzo solicitado. Sigue la
+[guía de transporte](docs/opencode-workers.md) para controlar modelo, modo,
+directorio y plazo. La documentación y los perfiles tienen validación estática;
+la aceptación de cada ruta requiere comprobar un despacho real, su modelo,
+reanudación y cancelación en el equipo de destino.

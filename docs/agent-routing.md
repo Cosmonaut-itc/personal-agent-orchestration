@@ -5,7 +5,10 @@ Política común para seleccionar trabajadores y revisores.
 ## Modelos
 
 Elige siempre dentro de esta tabla. Las puntuaciones son preferencias
-operativas (10 = mejor) y se ajustan con resultados observados.
+operativas (10 = mejor; en costo, más económico) y se ajustan con resultados
+observados. Inteligencia y gusto de los modelos Go son hipótesis iniciales,
+pendientes de calibrar con encargos propios. Gusto valora criterio de producto,
+claridad y coherencia visual; admitir imágenes no demuestra buen gusto.
 
 | Modelo        | costo | inteligencia | gusto | Cuándo |
 |---------------|-------|--------------|-------|--------|
@@ -15,16 +18,26 @@ operativas (10 = mejor) y se ajustan con resultados observados.
 | gpt-5.6-luna  | 10    | 7            | 4     | Encargos claros y fáciles de verificar. |
 | opus-5        | 4     | 8            | 8     | Gusto visual, decisiones de producto y contraste independiente de alto riesgo. |
 | sonnet-5      | 5     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
+| DeepSeek V4.1 Flash · Go | 10* | 8 | 6 | Primera opción económica para encargos técnicos acotados y verificables. |
+| MiniMax M3 · Go | 9 | 8 | 7 | Implementación frontend/backend y trabajo visual contra un diseño aprobado. |
+| Kimi K3 · Go | 6 | 9 | 8 | Escalón de mayor capacidad en Go para encargos complejos y contexto amplio; reservar cuota para trabajo que lo justifique. |
 
-Ninguna ruta es gratis. Los tokens Claude siguen siendo el recurso más caro,
-pero astra y sol consumen una cuota propia que se agota: más baratos que Opus,
-no ilimitados. El **presupuesto** son dos monedas limitadas, no una gratis y
-una cara.
+*DeepSeek recibe costo 10 mientras esté vigente la promoción 4×; fuera de
+ella, costo 8 sujeto a tarifas y cuota actuales. Verifica la promoción antes
+de usar esa ventaja para elegirlo; si no puedes confirmarla, usa costo 8.
+Consulta [tarifas y cuota Go](opencode-workers.md#tarifas-y-cuota).
+
+Ninguna ruta es gratis. Administra **tres presupuestos limitados: Codex,
+Claude y Go**. Los modelos de una misma suscripción Go comparten cuota:
+cambiar de perfil no recupera presupuesto agotado. Considera cuota disponible,
+tarifa, caché y reintentos al estimar el coste del encargo completo.
 
 Para ejecución, parte del modelo más barato que plausiblemente dé la talla y
 sube por escalado en vez de abrir con el más capaz; los pases obligatorios de
 revisión siguen su propia sección. Gasta Claude donde el gusto, el entorno o
-una perspectiva independiente pagan.
+una perspectiva independiente pagan. Con capacidad adecuada y cuota
+disponible, prefiere Go para ejecución acotada. Elige entre sus tres modelos
+por el encargo; no recorras los tres como una cadena obligatoria de reintentos.
 
 Compara el costo del despacho completo, no el precio nominal del modelo: astra
 en `low` puede salir más barato que sol en `high` para el mismo resultado, y un
@@ -32,8 +45,9 @@ despacho barato que hay que repetir cuesta más que el caro que cierra. En
 conflicto sobre algo que se embarca: **inteligencia > gusto > costo**. La
 elección explícita del usuario prevalece.
 
-El MCP `cheap-coder` (`stealth/ox-alpha`) está **deprecado por ahora**: sus
-tools pueden aparecer en la sesión, pero no están en la tabla.
+El MCP antiguo `cheap-coder` (`stealth/ox-alpha`) sigue **deprecado**. Los
+nuevos cheap coders de esta tabla usan OpenCode Go por la ruta documentada
+abajo; incluirlos no reactiva aquel MCP.
 
 ## Esfuerzo
 
@@ -52,13 +66,25 @@ Con Astra, `low` es el punto de partida habitual y `medium` cubre lo que con
 Sol pedía `high`; reserva `high` para incertidumbres que medium no resolvió.
 Un encargo que migra de Sol a Astra baja uno o dos niveles, no los conserva.
 
-El tope de cualquier despacho, sea quien sea el trabajador y aunque reanude,
-es **high**.
+El tope de cualquier despacho con escala de esfuerzo comparable, aunque
+reanude, es **high**. Esto incluye trabajadores, revisores, adaptadores y
+descendientes GPT/Claude.
 
 Configura el esfuerzo explícitamente en el runtime; un default de
 configuración no es un tope y pedirlo en el prompt no lo fija. Si se hereda,
 comprueba el valor efectivo. Si la ruta no permite fijarlo, usa otra ruta o
-resuelve directamente.
+resuelve directamente, salvo la excepción Go siguiente.
+
+**Go:** DeepSeek y Kimi K3 parten de low y escalan a high; ambos conservan el
+tope high. La guía fija variantes explícitas para K3 y exige comprobar su
+aplicación por Go. K3 sustituye al perfil K2.7 de modo fijo.
+
+**Excepción Go para MiniMax M3:** usa none/thinking. Configura y registra el
+modo nativo soportado y el presupuesto de pasos/duración indicado en su guía.
+No etiquetes un modo adaptativo como high ni confundas pasos con tokens. Si
+el control efectivo no puede verificarse, la ruta sigue pendiente de
+validación. Esta excepción no amplía el tope de los modelos que sí admiten
+una escala comparable.
 
 ## Escalado
 
@@ -93,6 +119,7 @@ Antes del primer despacho por una ruta en la sesión, lee su guía:
 | Claude Code → Claude (subagentes nativos) | `~/.agents/docs/native-subagents.md`, rama Claude Code |
 | Codex → Claude (CLI externo) | `~/.codex/docs/claude-workers.md` |
 | Claude Code → GPT (plugin o CLI) | `~/.claude/docs/codex-delegation.md` |
+| Codex o Claude Code → OpenCode Go (CLI externo o HTTP) | `~/.agents/docs/opencode-workers.md` |
 
 Las guías determinan mecanismos y parámetros; este documento determina la
 selección. Comunica cualquier sustitución de modelo o esfuerzo.
