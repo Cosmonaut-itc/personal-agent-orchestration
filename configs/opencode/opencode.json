@@ -49,7 +49,7 @@
       }
     },
     "cheap-coder-kimi": {
-      "description": "Encargos complejos y contexto amplio; habilitar tras validar razonamiento low/high en Go.",
+      "description": "Encargos complejos y contexto amplio; low de inicio y high al escalar.",
       "model": "opencode-go/kimi-k3",
       "mode": "all",
       "steps": 20,
@@ -67,7 +67,7 @@
         "task": "deny",
         "external_directory": "deny"
       },
-      "disable": true,
+      "disable": false,
       "thinking": {
         "type": "enabled"
       },

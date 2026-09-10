@@ -76,8 +76,10 @@ comprueba el valor efectivo. Si la ruta no permite fijarlo, usa otra ruta o
 resuelve directamente, salvo la excepción Go siguiente.
 
 **Go:** DeepSeek y Kimi K3 parten de low y escalan a high; ambos conservan el
-tope high. La guía fija variantes explícitas para K3 y exige comprobar su
-aplicación por Go. K3 sustituye al perfil K2.7 de modo fijo.
+tope high. K3 está habilitado con variantes explícitas low/high. Se verificó
+el envío y la aceptación de ambos valores por Go; el nivel interno aplicado
+no tiene confirmación observable. El dueño autorizó su uso con esta limitación
+y evaluación mediante encargos reales. K3 sustituye al perfil K2.7 de modo fijo.
 
 **Excepción Go para MiniMax M3:** usa none/thinking. Configura y registra el
 modo nativo soportado y el presupuesto de pasos/duración indicado en su guía.

@@ -96,9 +96,9 @@ para resolver su referencia relativa. Revisa colisiones de nombres antes de
 combinar. No reemplaces proveedores, MCP ni otras preferencias existentes.
 
 Los perfiles parten de lectura y búsqueda; los permisos de implementación
-se fijan por encargo mediante overrides de ejecución. Kimi permanece
-deshabilitado hasta validar que Go aplica el esfuerzo solicitado. Sigue la
-[guía de transporte](docs/opencode-workers.md) para controlar modelo, modo,
-directorio y plazo. La documentación y los perfiles tienen validación estática;
-la aceptación de cada ruta requiere comprobar un despacho real, su modelo,
-reanudación y cancelación en el equipo de destino.
+se fijan por encargo mediante overrides de ejecución. Kimi K3 está habilitado
+con low de inicio y high al escalar. Go recibió y aceptó ambos valores en
+pruebas reales; el dueño autorizó su uso aceptando que el nivel interno
+aplicado no tiene confirmación observable. Sigue la
+[guía de transporte](docs/opencode-workers.md) para consultar la evidencia,
+las comprobaciones pendientes y los controles de cada despacho.

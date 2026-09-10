@@ -1,7 +1,7 @@
 # Despachar trabajadores mediante OpenCode Go
 
 Referencia técnica consultada: 2026-09-10. Instalación: `~/.agents/docs/opencode-workers.md`.
-Validación estática; cada equipo debe completar la aceptación de la ruta.
+Estado de las pruebas y alcance autorizado: véase «Estado de validación».
 
 Lee esta guía antes de despachar desde Codex o Claude Code a un cheap coder
 de Go. La selección pertenece a `agent-routing.md`; esta guía define el
@@ -50,9 +50,11 @@ autenticado ni probado en esta cuenta.
 ## Perfil y controles efectivos
 
 Los perfiles y `worker-prompt.md` están en `configs/opencode/` del repositorio.
-Conserva el prompt junto al JSON al instalar. El perfil Kimi tiene
-`disable: true` hasta comprobar que Go aplica el esfuerzo solicitado a K3; no
-confundir la presencia de un modelo en el catálogo con esa validación.
+Conserva el prompt junto al JSON al instalar. El perfil Kimi está habilitado
+con `disable: false`, low de inicio y high al escalar. El dueño autorizó su
+uso el 2026-09-10 tras verificar envío y aceptación de ambas variantes por Go,
+aceptando que el esfuerzo interno aplicado no tiene confirmación observable.
+Esta limitación no bloquea el despacho; evalúa los resultados de cada encargo.
 
 Los perfiles usan `mode: all`: pueden actuar como agentes directos del
 runtime OpenCode y como subagentes cuando corresponda. Son trabajadores
@@ -112,13 +114,13 @@ configuración global. [Precedencia](https://opencode.ai/docs/config/).
 |---|---|
 | DeepSeek V4.1 Flash | `--variant low` de inicio; `high` si hace falta. Verificar que se transmite `reasoning_effort`; DeepSeek mapea medium a high. |
 | MiniMax M3 | `--variant thinking` para coding; `none` sólo para encargos apropiados. OpenCode traduce thinking a modo adaptativo, no a un nivel high. |
-| Kimi K3 | `reasoningEffort: "low"` en el perfil; variantes explícitas low/high. Usar `--variant low` de inicio y high al escalar; max/xhigh deshabilitados. Pendiente de validar en Go. |
+| Kimi K3 | `reasoningEffort: "low"` en el perfil; variantes explícitas low/high. Usar `--variant low` de inicio y high al escalar; max/xhigh deshabilitados. Envío y aceptación verificados en Go; nivel interno aplicado no observable. |
 
 Fuentes: [DeepSeek](https://api-docs.deepseek.com/guides/thinking_mode/),
 [transformaciones de OpenCode](https://github.com/anomalyco/opencode/blob/dev/packages/opencode/src/provider/transform.ts),
 [controles Kimi K3](https://www.kimi.com/code/docs/en/kimi-code/models.html).
 K3 documenta low/high/max en su API; este contrato limita su uso a low/high.
-El transporte Go debe verificarse en la aceptación de la ruta. La excepción
+El transporte Go se comprobó para low/high con el alcance descrito abajo. La excepción
 de modo adaptativo corresponde a MiniMax, no a K3.
 
 El código examinado no crea variantes automáticas para Kimi sobre el SDK
@@ -129,13 +131,13 @@ al perfil. El modelo del catálogo sigue siendo `opencode-go/kimi-k3`.
 
 El SDK compatible convierte `reasoningEffort` a `reasoning_effort` y el proxy
 Go preserva el cuerpo. El perfil conserva `thinking: {type: "enabled"}`.
-Esa inspección acredita el transporte estático de opciones, no su semántica
-en el backend.
+La inspección estática y las capturas de ejecución acreditan el transporte
+de opciones. Las respuestas observadas no confirman su semántica interna.
 [Normalización](https://github.com/anomalyco/opencode/blob/dev/packages/core/src/v1/config/agent.ts),
 [SDK compatible 2.0.41](https://unpkg.com/@ai-sdk/openai-compatible@2.0.41/dist/index.mjs),
 [cuerpo de petición Go](https://github.com/anomalyco/opencode/blob/dev/packages/console/app/src/routes/zen/util/requestBody.ts).
-La prueba de activación puede habilitar una copia aislada del perfil; conservar
-el perfil habitual deshabilitado hasta aceptar la evidencia.
+El perfil habitual queda habilitado por autorización del dueño con la
+limitación indicada; conserva modelo y variante en la evidencia del encargo.
 
 Entre los tres trabajadores seleccionados, K3 ocupa el puesto de mayor
 capacidad. Moonshot lo presenta como su modelo de programación más capaz,
@@ -165,7 +167,7 @@ opencode run \
 
 Para un encargo K3, conserva el mismo procedimiento y usa
 `--agent cheap-coder-kimi --model opencode-go/kimi-k3 --variant low`; requiere
-perfil habilitado tras validación y variantes instaladas. Al reanudar, conserva
+perfil y variantes instalados. Al reanudar, conserva
 el ID de sesión y fija nuevamente modelo y esfuerzo; no cambies una sesión
 K2.7 a K3 para empezar el encargo nuevo.
 
@@ -237,13 +239,27 @@ cambiar el modelo entre encargos. [API](https://opencode.ai/docs/server/),
 
 ## Estado de validación
 
-Contrato, documentación pública, catálogo público y código fuente examinados.
-No se ha ejecutado un trabajador OpenCode. Antes de habilitar esta ruta:
-validar versión/perfiles/opciones, un encargo por modelo, read-back del modelo,
-reanudación, cancelación y fallo ante perfil inválido. Los perfiles están en
-`configs/opencode/` del repositorio. Esta guía no implementa un lanzador: el
-runtime que despacha debe aplicar los controles de proceso y plazo descritos
-antes de habilitar la ruta.
+Pruebas ejecutadas el 2026-09-10 con OpenCode 1.18.30 y la cuenta Go conectada:
+
+- DeepSeek V4.1 Flash, MiniMax M3 y Kimi K3 leyeron un archivo y resolvieron
+  correctamente el cálculo solicitado; las sesiones exportadas confirmaron
+  agente, proveedor, modelo y variante.
+- Kimi K3 respondió correctamente al mismo problema con low y high. La captura
+  de la llamada nativa confirmó `reasoning_effort: low` y `high`, HTTP 200
+  y modelo de respuesta `kimi-k3`. La revisión independiente aceptó ese alcance.
+- Las respuestas no ofrecieron una lectura explícita del esfuerzo interno
+  aplicado. Diferencias de tokens o duración no demuestran ese nivel. El dueño
+  aceptó la limitación y autorizó habilitar Kimi para evaluar encargos reales.
+
+El envío y la aceptación están verificados; la falta de lectura del nivel
+interno no bloquea el uso autorizado de Kimi. Calibra resultados observados
+sin convertir esta aceptación operativa en una confirmación del proveedor.
+
+Reanudación, cancelación y rechazo de perfiles inválidos siguen sin prueba
+específica de aceptación. Al usar esas operaciones, aplica los controles de
+esta guía y comprueba el resultado. Los perfiles están en `configs/opencode/`.
+Esta guía no implementa un lanzador: el runtime que despacha debe controlar
+procesos, perfil efectivo y plazo desde el primer encargo.
 
 ## Tarifas y cuota
 
