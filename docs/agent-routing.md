@@ -4,7 +4,8 @@ Política común para seleccionar trabajadores y revisores.
 
 ## Modelos
 
-Elige siempre dentro de esta tabla. Las puntuaciones son preferencias
+Elige siempre dentro de esta tabla; los entrypoints globales llevan una
+copia, así que al cambiarla replícala en ambos. Las puntuaciones son preferencias
 operativas (10 = mejor; en costo, más económico) y se ajustan con resultados
 observados. Inteligencia y gusto de los modelos Go, y de gpt-6-sol y
 gpt-6-luna (heredados de sus predecesores 5.6), son hipótesis iniciales,

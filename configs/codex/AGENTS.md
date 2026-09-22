@@ -6,7 +6,23 @@ ejecutar un encargo recibido de otro agente. Es copia sincronizada de
 cambia la otra.
 
 Antes de elegir trabajador, esfuerzo, revisión o tratamiento UI/UX, lee
-`~/.agents/docs/agent-routing.md`.
+`~/.agents/docs/agent-routing.md`. Su tabla de modelos se reproduce aquí como
+referencia rápida (10 = mejor; en costo, más económico); el routing es la
+fuente: al cambiar una, cambia la otra.
+
+| Modelo        | costo | inteligencia | gusto | Cuándo |
+|---------------|-------|--------------|-------|--------|
+| gpt-6-astra   | 5     | 10           | 7     | Problemas más complejos que Sol no resolvió o que claramente lo superan; primer pase de revisión. |
+| gpt-6-sol     | 8     | 9            | 6     | Opción habitual para ejecución técnica; cuesta la mitad que gpt-5.6-sol. |
+| gpt-5.6-terra | 9     | 8            | 5     | Alternativa a Sol cuando el proyecto o el transporte lo favorezcan. |
+| gpt-6-luna    | 10    | 7            | 4     | Primera opción Codex para encargos claros y fáciles de verificar; cuesta la mitad que gpt-5.6-luna. |
+| opus-5        | 4     | 8            | 8     | Gusto visual, decisiones de producto y contraste independiente de alto riesgo. |
+| sonnet-5      | 5     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
+| DeepSeek V4.1 Flash · Go | 10* | 8 | 6 | Primera opción económica para encargos técnicos acotados y verificables. |
+| MiniMax M3 · Go | 9 | 8 | 7 | Implementación frontend/backend y trabajo visual contra un diseño aprobado. |
+| Kimi K3 · Go | 6 | 9 | 8 | Escalón de mayor capacidad en Go para encargos complejos y contexto amplio; reservar cuota para trabajo que lo justifique. |
+
+*DeepSeek: costo 10 sólo con la promoción 4× vigente y verificada; si no, 8.
 
 Para delegar en los cheap coders de OpenCode Go, consulta la selección y
 el esfuerzo en ese routing; antes del primer despacho, lee

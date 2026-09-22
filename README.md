@@ -28,7 +28,8 @@ el primer turno sin una lectura previa. `docs/orchestration.md` es la fuente
 canónica: al editarlo, replica el cambio en ambos entrypoints.
 
 El [routing](docs/agent-routing.md) es la única fuente para elegir modelo,
-esfuerzo y pases de review. Los entrypoints apuntan a esa política; las guías
+esfuerzo y pases de review. Los entrypoints apuntan a esa política y copian
+su tabla de modelos, que debe mantenerse sincronizada; las guías
 describen cómo ejecutarla en cada entorno.
 
 ## Rutas de ejecución
