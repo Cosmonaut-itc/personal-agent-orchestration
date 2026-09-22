@@ -6,16 +6,18 @@ Política común para seleccionar trabajadores y revisores.
 
 Elige siempre dentro de esta tabla. Las puntuaciones son preferencias
 operativas (10 = mejor; en costo, más económico) y se ajustan con resultados
-observados. Inteligencia y gusto de los modelos Go son hipótesis iniciales,
-pendientes de calibrar con encargos propios. Gusto valora criterio de producto,
-claridad y coherencia visual; admitir imágenes no demuestra buen gusto.
+observados. Inteligencia y gusto de los modelos Go, y de gpt-6-sol y
+gpt-6-luna (heredados de sus predecesores 5.6), son hipótesis iniciales,
+pendientes de calibrar con encargos propios. Gusto valora criterio de
+producto, claridad y coherencia visual; admitir imágenes no demuestra buen
+gusto.
 
 | Modelo        | costo | inteligencia | gusto | Cuándo |
 |---------------|-------|--------------|-------|--------|
-| gpt-6-astra   | 5     | 10           | 7     | Razonamiento y juicio difícil; primer pase de revisión. |
-| gpt-5.6-sol   | 6     | 9            | 6     | Opción habitual para ejecución técnica. |
+| gpt-6-astra   | 5     | 10           | 7     | Problemas más complejos que Sol no resolvió o que claramente lo superan; primer pase de revisión. |
+| gpt-6-sol     | 8     | 9            | 6     | Opción habitual para ejecución técnica; cuesta la mitad que gpt-5.6-sol. |
 | gpt-5.6-terra | 9     | 8            | 5     | Alternativa a Sol cuando el proyecto o el transporte lo favorezcan. |
-| gpt-5.6-luna  | 10    | 7            | 4     | Encargos claros y fáciles de verificar. |
+| gpt-6-luna    | 10    | 7            | 4     | Primera opción Codex para encargos claros y fáciles de verificar; cuesta la mitad que gpt-5.6-luna. |
 | opus-5        | 4     | 8            | 8     | Gusto visual, decisiones de producto y contraste independiente de alto riesgo. |
 | sonnet-5      | 5     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
 | DeepSeek V4.1 Flash · Go | 10* | 8 | 6 | Primera opción económica para encargos técnicos acotados y verificables. |
@@ -32,6 +34,10 @@ Claude y Go**. Los modelos de una misma suscripción Go comparten cuota:
 cambiar de perfil no recupera presupuesto agotado. Considera cuota disponible,
 tarifa, caché y reintentos al estimar el coste del encargo completo.
 
+gpt-6-sol y gpt-6-luna cuestan la mitad que gpt-5.6-sol y gpt-5.6-luna, a
+los que sustituyen. Dentro del presupuesto Codex son el punto de partida para
+ejecución: luna si el encargo es claro y verificable, sol si pide más criterio.
+
 Para ejecución, parte del modelo más barato que plausiblemente dé la talla y
 sube por escalado en vez de abrir con el más capaz; los pases obligatorios de
 revisión siguen su propia sección. Gasta Claude donde el gusto, el entorno o
@@ -39,11 +45,11 @@ una perspectiva independiente pagan. Con capacidad adecuada y cuota
 disponible, prefiere Go para ejecución acotada. Elige entre sus tres modelos
 por el encargo; no recorras los tres como una cadena obligatoria de reintentos.
 
-Compara el costo del despacho completo, no el precio nominal del modelo: astra
-en `low` puede salir más barato que sol en `high` para el mismo resultado, y un
-despacho barato que hay que repetir cuesta más que el caro que cierra. En
-conflicto sobre algo que se embarca: **inteligencia > gusto > costo**. La
-elección explícita del usuario prevalece.
+Compara el costo del despacho completo, no el precio nominal del modelo: un
+modelo capaz en `low` puede salir más barato que uno económico en `high` para
+el mismo resultado, y un despacho barato que hay que repetir cuesta más que
+el caro que cierra. En conflicto sobre algo que se embarca: **inteligencia >
+gusto > costo**. La elección explícita del usuario prevalece.
 
 El MCP antiguo `cheap-coder` (`stealth/ox-alpha`) sigue **deprecado**. Los
 nuevos cheap coders de esta tabla usan OpenCode Go por la ruta documentada
@@ -61,10 +67,12 @@ cada modelo. El esfuerzo sigue la incertidumbre del encargo, no su tamaño.
 | high | Persisten incertidumbres importantes o se necesita razonamiento profundo. |
 
 **gpt-6-astra se calibra un escalón por debajo.** Astra en low rinde más que
-Sol en high, según [OpenAI](https://x.com/thsottiaux/status/2096688770523467947).
+gpt-5.6-sol en high, según [OpenAI](https://x.com/thsottiaux/status/2096688770523467947).
 Con Astra, `low` es el punto de partida habitual y `medium` cubre lo que con
-Sol pedía `high`; reserva `high` para incertidumbres que medium no resolvió.
-Un encargo que migra de Sol a Astra baja uno o dos niveles, no los conserva.
+gpt-5.6-sol pedía `high`; reserva `high` para incertidumbres que medium no
+resolvió. Sol y Astra se distinguen por el tipo de problema, no por
+equivalencias de esfuerzo: al pasar de Sol a Astra, elige el esfuerzo de
+Astra por la incertidumbre que queda.
 
 El tope de cualquier despacho con escala de esfuerzo comparable, aunque
 reanude, es **high**. Esto incluye trabajadores, revisores, adaptadores y
@@ -93,7 +101,9 @@ una escala comparable.
 Tienes **permiso permanente** de escalar a un modelo o esfuerzo mejor cuando
 el output no da la talla, sin preguntar. Escala ante contradicciones,
 hipótesis pendientes o criterios de aceptación incumplidos por razonamiento;
-entrega al nuevo intento la evidencia útil del anterior.
+entrega al nuevo intento la evidencia útil del anterior. En Codex, el paso
+habitual es de Sol a Astra cuando el problema resultó más complejo de lo que
+Sol pudo resolver.
 
 La falta de contexto, acceso o herramientas se resuelve aparte, no escalando.
 Si ninguna opción de la tabla basta, devuelve el estado parcial y la decisión

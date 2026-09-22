@@ -75,7 +75,7 @@ timeout --signal=KILL "$max_secs" codex exec \
   siempre el prompt por stdin explícito (`- < brief`) o redirige `</dev/null`.
 - **Modelo.** Un alias corto (`sol`) o cualquier `-m` no soportado devuelve
   `400 ... not supported` y **exit 0** con el árbol intacto. Usa el nombre
-  completo (`gpt-5.6-sol`).
+  completo (`gpt-6-sol`).
 - **Flags.** Un flag inválido (`--search` no existe) falla en el parseo con
   exit 0 y un output de pocas líneas. La búsqueda web se controla por
   `web_search` en `config.toml`.
