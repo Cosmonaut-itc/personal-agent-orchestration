@@ -14,7 +14,6 @@ fuente: al cambiar una, cambia la otra.
 |---------------|-------|--------------|-------|--------|
 | gpt-6-astra   | 5     | 10           | 7     | Problemas más complejos que Sol no resolvió o que claramente lo superan; primer pase de revisión. |
 | gpt-6-sol     | 8     | 9            | 6     | Opción habitual para ejecución técnica; cuesta la mitad que gpt-5.6-sol. |
-| gpt-5.6-terra | 9     | 8            | 5     | Alternativa a Sol cuando el proyecto o el transporte lo favorezcan. |
 | gpt-6-luna    | 10    | 7            | 4     | Primera opción Codex para encargos claros y fáciles de verificar; cuesta la mitad que gpt-5.6-luna. |
 | opus-5        | 4     | 8            | 8     | Gusto visual, decisiones de producto y contraste independiente de alto riesgo. |
 | sonnet-5      | 5     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
