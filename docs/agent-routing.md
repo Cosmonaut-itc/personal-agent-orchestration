@@ -7,19 +7,19 @@ Política común para seleccionar trabajadores y revisores.
 Elige siempre dentro de esta tabla; los entrypoints globales llevan una
 copia, así que al cambiarla replícala en ambos. Las puntuaciones son preferencias
 operativas (10 = mejor; en costo, más económico) y se ajustan con resultados
-observados. Inteligencia y gusto de los modelos Go, y de gpt-6-sol y
-gpt-6-luna (heredados de sus predecesores 5.6), son hipótesis iniciales,
+observados. Inteligencia y gusto de los modelos Go, y de gpt-6.1-sol y
+gpt-6-luna, son hipótesis iniciales,
 pendientes de calibrar con encargos propios. Gusto valora criterio de
 producto, claridad y coherencia visual; admitir imágenes no demuestra buen
 gusto.
 
 | Modelo        | costo | inteligencia | gusto | Cuándo |
 |---------------|-------|--------------|-------|--------|
-| gpt-6-astra   | 5     | 10           | 7     | Problemas más complejos que Sol no resolvió o que claramente lo superan; primer pase de revisión. |
-| gpt-6-sol     | 8     | 9            | 6     | Opción habitual para ejecución técnica; cuesta la mitad que gpt-5.6-sol. |
+| gpt-6-astra   | 5     | 10           | 7     | Problemas más complejos que Sol no resolvió o que claramente lo superan; reviews de cambios en high. |
+| gpt-6.1-sol   | 9     | 9            | 6     | Opción habitual para ejecución técnica. |
 | gpt-6-luna    | 10    | 7            | 4     | Primera opción Codex para encargos claros y fáciles de verificar; cuesta la mitad que gpt-5.6-luna. |
-| opus-5        | 4     | 8            | 8     | Gusto visual, decisiones de producto y contraste independiente de alto riesgo. |
-| sonnet-5      | 5     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
+| opus-5.5      | 8     | 9            | 9     | Gusto visual y decisiones de producto. |
+| sonnet-5      | 6     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
 | DeepSeek V4.1 Flash · Go | 10* | 8 | 6 | Primera opción económica para encargos técnicos acotados y verificables. |
 | MiniMax M3 · Go | 9 | 8 | 7 | Implementación frontend/backend y trabajo visual contra un diseño aprobado. |
 | Kimi K3 · Go | 6 | 9 | 8 | Escalón de mayor capacidad en Go para encargos complejos y contexto amplio; reservar cuota para trabajo que lo justifique. |
@@ -34,8 +34,8 @@ Claude y Go**. Los modelos de una misma suscripción Go comparten cuota:
 cambiar de perfil no recupera presupuesto agotado. Considera cuota disponible,
 tarifa, caché y reintentos al estimar el coste del encargo completo.
 
-gpt-6-sol y gpt-6-luna cuestan la mitad que gpt-5.6-sol y gpt-5.6-luna, a
-los que sustituyen. Dentro del presupuesto Codex son el punto de partida para
+gpt-6-luna cuesta la mitad que gpt-5.6-luna, al que sustituye. Dentro del
+presupuesto Codex, gpt-6-luna y gpt-6.1-sol son el punto de partida para
 ejecución: luna si el encargo es claro y verificable, sol si pide más criterio.
 
 Para ejecución, parte del modelo más barato que plausiblemente dé la talla y
@@ -66,8 +66,9 @@ cada modelo. El esfuerzo sigue la incertidumbre del encargo, no su tamaño.
 | medium | Hace falta interpretar, planificar o comparar alternativas; punto de partida habitual. |
 | high | Persisten incertidumbres importantes o se necesita razonamiento profundo. |
 
-**gpt-6-astra se calibra un escalón por debajo.** Astra en low rinde más que
-gpt-5.6-sol en high, según [OpenAI](https://x.com/thsottiaux/status/2096688770523467947).
+**Fuera de reviews de cambios, gpt-6-astra se calibra un escalón por debajo.**
+Astra en low rinde más que gpt-5.6-sol en high, según
+[OpenAI](https://x.com/thsottiaux/status/2096688770523467947).
 Con Astra, `low` es el punto de partida habitual y `medium` cubre lo que con
 gpt-5.6-sol pedía `high`; reserva `high` para incertidumbres que medium no
 resolvió. Sol y Astra se distinguen por el tipo de problema, no por
@@ -111,14 +112,11 @@ pendiente.
 
 ## Revisión y UI/UX
 
-Primer pase técnico: un revisor independiente con gpt-6-astra, esfuerzo según
-los criterios anteriores. Un cambio de **alto riesgo** añade un pase opus-5
-independiente: auth, permisos, migraciones de datos, releases y lo que el
-proyecto clasifique así. Después el orquestador veta tanto el cambio como los
-hallazgos.
+Las reviews de cambios las hace únicamente un revisor independiente con
+gpt-6-astra en esfuerzo `high`. El orquestador veta el cambio y los hallazgos.
 
 UI/UX: primero un prototipo de fidelidad baja o media aprobado por el dueño.
-Si faltan prototipo y guía, diseña opus-5. Implementa con los criterios
+Si faltan prototipo y guía, diseña opus-5.5. Implementa con los criterios
 generales y verifica contra el diseño y sus estados de interacción.
 
 ## Transporte

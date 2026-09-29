@@ -12,11 +12,11 @@ fuente: al cambiar una, cambia la otra.
 
 | Modelo        | costo | inteligencia | gusto | Cuándo |
 |---------------|-------|--------------|-------|--------|
-| gpt-6-astra   | 5     | 10           | 7     | Problemas más complejos que Sol no resolvió o que claramente lo superan; primer pase de revisión. |
-| gpt-6-sol     | 8     | 9            | 6     | Opción habitual para ejecución técnica; cuesta la mitad que gpt-5.6-sol. |
+| gpt-6-astra   | 5     | 10           | 7     | Problemas más complejos que Sol no resolvió o que claramente lo superan; reviews de cambios en high. |
+| gpt-6.1-sol   | 9     | 9            | 6     | Opción habitual para ejecución técnica. |
 | gpt-6-luna    | 10    | 7            | 4     | Primera opción Codex para encargos claros y fáciles de verificar; cuesta la mitad que gpt-5.6-luna. |
-| opus-5        | 4     | 8            | 8     | Gusto visual, decisiones de producto y contraste independiente de alto riesgo. |
-| sonnet-5      | 5     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
+| opus-5.5      | 8     | 9            | 9     | Gusto visual y decisiones de producto. |
+| sonnet-5      | 6     | 5            | 7     | Trabajo en el entorno Claude que no requiera el juicio de Opus. |
 | DeepSeek V4.1 Flash · Go | 10* | 8 | 6 | Primera opción económica para encargos técnicos acotados y verificables. |
 | MiniMax M3 · Go | 9 | 8 | 7 | Implementación frontend/backend y trabajo visual contra un diseño aprobado. |
 | Kimi K3 · Go | 6 | 9 | 8 | Escalón de mayor capacidad en Go para encargos complejos y contexto amplio; reservar cuota para trabajo que lo justifique. |
@@ -29,9 +29,10 @@ el esfuerzo en ese routing; antes del primer despacho, lee
 autenticación, recogida y cancelación. Aplica sus controles y el alcance
 autorizado en «Estado de validación» al preparar cada encargo.
 
-Con gpt-6-astra parte de esfuerzo `low`: su low rinde más que el high de
-gpt-5.6-sol. Sube a `medium` sólo con incertidumbre real y a `high` cuando
-medium no baste.
+Con gpt-6-astra parte de esfuerzo `low` para tareas que no sean reviews de
+cambios: su low rinde más que el high de gpt-5.6-sol. Sube a `medium` sólo
+con incertidumbre real y a `high` cuando medium no baste. Las reviews de
+cambios requieren gpt-6-astra en `high`.
 
 ## Roles
 
