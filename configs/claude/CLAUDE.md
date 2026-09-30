@@ -34,6 +34,13 @@ cambios: su low rinde más que el high de gpt-5.6-sol. Sube a `medium` sólo
 con incertidumbre real y a `high` cuando medium no baste. Las reviews de
 cambios requieren gpt-6-astra en `high`.
 
+Para delegar en Codex, lee `~/.claude/docs/codex-delegation.md`. Usa primero
+la cuenta Outlook, pasando en cada invocación
+`CODEX_HOME=/Users/felixddhs/.config/codex-cli` (alias `codex`). Cambia a la
+cuenta Gmail, `CODEX_HOME=/Users/felixddhs/.codex` (alias `codex-original`),
+sólo cuando Outlook agote su límite de uso, y vuelve a Outlook en el
+siguiente despacho.
+
 ## Roles
 
 - **Orquestador:** recibe la tarea del usuario, decide el reparto, conserva
